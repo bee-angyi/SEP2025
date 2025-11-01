@@ -1,0 +1,137 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+header, footer {
+  background: linear-gradient(90deg, #0a2540, #1939b7, #00b4db);
+  color: #ffffff;
+  text-align: center;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: 2px;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 0 10px #00b4db, 0 0 20px #00f2fe;
+}
+
+/* animated glowing effect */
+header::before, footer::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(45deg, #00b4db, #0083b0, #00f2fe);
+  background-size: 400% 400%;
+  animation: glow 8s ease infinite;
+  opacity: 0.2;
+  z-index: 0;
+}
+
+@keyframes glow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+header h1, footer p {
+  position: relative;
+  z-index: 1; /* keep text above the glowing layer */
+}
+
+nav {
+  background: #5F4E0C; 
+  padding-top: 20px;
+  border-right: 2px solid #c5b300; /* neon border line */
+  box-shadow: 0 0 15px #c5b30080; /* soft glowing border */
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+nav ul li a {
+  display: block;
+  padding: 10px 16px;
+  background: linear-gradient(145deg, #c5b300, #9a9000);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px #c5b30050, inset 0 0 10px #9a900050;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+nav ul li a:hover {
+  background: linear-gradient(145deg, #f0ff4f, #c5b300);
+  color: #000;
+  box-shadow: 0 0 15px #f0ff4f, 0 0 25px #f0ff4f;
+  transform: scale(1.05);
+}
+
+.content {
+  padding: 20px;
+  text-align: center;
+}
+
+.content-frame {
+  width: 100%;
+  height: 480px;   
+  border: none;
+  text-align: left;
+}
+
+
+/* =========================
+   Mobile (≤ 360px)
+   ========================= */
+@media (max-width: 360px) {
+  body {
+    font-size: 12px;
+  }
+
+  nav ul {
+    flex-direction: column; 
+    align-items: center;
+  }
+
+  nav ul li {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* =========================
+   Tablet (361px – 768px)
+   ========================= */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  nav ul {
+    flex-direction: row; 
+  }
+}
+
+/* =========================
+   Desktop (≥ 769px)
+   ========================= */
+@media (min-width: 769px) {
+  body {
+    font-size: 16px;
+    max-width: 1500px;
+    margin: auto;
+  }
+
+  .content {
+    text-align: left;
+  }
+}
