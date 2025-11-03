@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Crescendo Halloween Chess Night</title>
+
+<!-- chessboard.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/css/chessboard-1.0.0.min.css" integrity="" crossorigin="anonymous"/>
+
+<style>
+  :root{--accent:#ff3355;--muted:#ffdfe8}
+  html,body{height:100%;margin:0;background:radial-gradient(circle at 30% 20%, #140012 0%, #000000 65%);color:#fff;font-family:Inter, Roboto, "Helvetica Neue", Arial;}
+  header{padding:20px;text-align:center;border-bottom:1px solid rgba(255,0,80,0.04)}
+  h1{margin:0;color:var(--accent);text-shadow:0 0 18px rgba(255,51,85,0.12);font-size:1.9rem}
+  .lead{margin-top:6px;color:var(--muted);font-size:0.95rem}
+
+  .wrap{max-width:1100px;margin:18px auto;display:flex;gap:20px;align-items:flex-start;justify-content:center;padding:12px;flex-wrap:wrap}
+  .left{flex:1 1 560px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .right{width:320px;flex:0 0 320px;display:flex;flex-direction:column;gap:12px}
+
+  .board-box{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 40px rgba(0,0,0,0.6)}
+  #board{width:420px;max-width:92vw;margin:0 auto}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .btn{background:linear-gradient(180deg,var(--accent),#7a0066);color:#fff;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,0.6)}
+  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  .small{padding:6px 10px;font-size:0.95rem}
+
+  .card{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+  .card h3{margin:0;color:var(--accent)}
+  .intro{color:var(--muted);line-height:1.45;margin-top:8px}
+  .joinbtn{display:inline-block;padding:8px 10px;border-radius:8px;background:#1b1b1b;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+
+  footer{margin-top:26px;padding:14px;text-align:center;color:#f3dfe8;font-size:0.9rem}
+
+  /* victory modal */
+  .modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);min-width:260px;background:linear-gradient(180deg,#2a001a,#12000a);border-radius:12px;padding:14px;border:2px solid rgba(255,45,111,0.18);box-shadow:0 30px 80px rgba(0,0,0,0.7);z-index:9999;transition:transform 220ms;}
+  .modal.show{transform:translate(-50%,-50%) scale(1)}
+  .modal h2{margin:6px 0;color:#ffd6e6;font-family:serif}
+
+  /* bats canvas */
+  canvas#batsCanvas{position:fixed;left:0;top:0;z-index:-1;width:100%;height:100%}
+
+  /* responsive */
+  @media (max-width:900px){
+    .right{order:3;width:92%}
+    .left{order:1;width:92%}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="batsCanvas" aria-hidden="true"></canvas>
+
+<header>
+  <h1>🎃 Crescendo Halloween Chess Night</h1>
+  <p class="lead">Checkmate the Ghost King — if you dare. Hosted by Crescendo Chess Club · Ang Yi (President)</p>
+</header>
+
+<div class="wrap">
+  <div class="left">
+    <div class="board-box">
+      <div id="board"></div>
+      <div class="controls">
+        <button id="modeToggle" class="btn small">Mode: Free Play</button>
+        <button id="newPuzzle" class="btn small secondary">New Puzzle</button>
+        <button id="hintBtn" class="btn small secondary">Hint</button>
+        <button id="musicBtn" class="btn small">Music: On</button>
+      </div>
+      <div id="status" style="text-align:center;margin-top:8px;color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <aside class="right">
+    <div class="card">
+      <h3>Crescendo Chess Club</h3>
+      <p class="intro">Welcome to Crescendo — 在这里策略与艺术交织。加入我们每周训练、友谊赛与主题活动。</p>
+      <p style="margin-top:8px;font-size:0.95rem">Presented by <strong>Ang Yi</strong>, President</p>
+      <div style="margin-top:10px"><button id="joinBtn" class="joinbtn">🎭 Join Crescendo Club</button></div>
+    </div>
+
+    <div class="card">
+      <h3>How to play</h3>
+      <ol style="text-align:left">
+        <li>Mode = Free Play：双方棋子都可移动，自由练习或和朋友轮流下。</li>
+        <li>Mode = Puzzle：页面会随机载入一道 Ghost Puzzle（找关键将死步）。</li>
+        <li>使用 Hint 可显示关键目标格（短提示）。</li>
+      </ol>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://example.com/ghost-chess" alt="qr" style="width:84px;height:84px;border-radius:6px;border:1px solid rgba(255,255,255,0.04)"/>
+        <div style="font-size:0.9rem;color:var(--muted)">Scan to open on mobile (upload to GitHub Pages later to replace URL)</div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- victory modal -->
+<div id="victory" class="modal" aria-hidden="true">
+  <div style="text-align:center">
+    <h2>🎉 Great! You found a way to checkmate the Ghost King!</h2>
+    <p style="color:#ffdfe8">Show this to the Crescendo booth to claim your prize.</p>
+    <div style="margin-top:12px"><button id="playAgain" class="btn">Play Again</button></div>
+  </div>
+</div>
+
+<footer>
+  <div>Where strategy meets the supernatural — Crescendo Chess Club</div>
+  <div style="margin-top:6px">© 2025 Crescendo International College</div>
+</footer>
+
+<!-- chess.js & chessboard.js (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/js/chessboard-1.0.0.min.js"></script>
+
+<script>
+/* ====== Script: interactive board + puzzles + bats + music ====== */
+
+(function(){
+  // --- puzzles (random) : simplified sample puzzles (FEN + keys as uci 'e2e4') ---
+  const puzzles = [
+    { name:"Mate in 1 — The Ghost King is careless", fen:"6k1/5ppp/8/8/8/5Q2/5PPP/6K1 w - - 0 1", keys:["d1e7"] },
+    { name:"Quick Check — Through the crimson mist", fen:"6k1/5ppp/8/8/8/8/5PPP/5QK1 w - - 0 1", keys:["d1g4"] },
+    { name:"Phantom Fork — A spirit's trick", fen:"6k1/5ppp/8/8/8/8/5PPP/4Q1K1 w - - 0 1", keys:["d1d5"] },
+    { name:"Escape Trap — Save your Queen before dawn", fen:"6k1/5ppp/8/8/8/8/5PPP/4Q1K1 w - - 0 1", keys:["d1e2"] },
+    { name:"Final Checkmate — Silence the Ghost King forever", fen:"6k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1", keys:["d1g4"] }
+  ];
+
+  // state
+  let mode = 'free'; // 'free' or 'puzzle'
+  let currentPuzzle = null;
+  let board = null;
+  let game = null;
+  let musicOn = true;
+  let audioCtx = null, drone = null;
+
+  // DOM
+  const modeToggle = document.getElementById('modeToggle');
+  const newPuzzleBtn = document.getElementById('newPuzzle');
+  const hintBtn = document.getElementById('hintBtn');
+  const status = document.getElementById('status');
+  const musicBtn = document.getElementById('musicBtn');
+
+  // pick random puzzle
+  function pickRandom(){
+    return JSON.parse(JSON.stringify(puzzles[Math.floor(Math.random()*puzzles.length)]));
+  }
+
+  // init board with fen
+  function initBoard(fen){
+    if(board) board.destroy();
+    game = new Chess(fen);
+    board = Chessboard('board', {
+      draggable: true,
+      position: fen,
+      onDragStart: onDragStart,
+      onDrop: onDrop,
+      onSnapEnd: onSnapEnd,
+      pieceTheme: 'https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/img/chesspieces/wikipedia/{piece}.png'
+    });
+    updateStatusText();
+  }
+
+  // update header status
+  function updateStatusText(){
+    if(mode==='free'){
+      status.textContent = 'Mode: Free Play — move any side.';
+    } else if(mode==='puzzle' && currentPuzzle){
+      status.textContent = 'Puzzle: ' + currentPuzzle.name;
+    } else {
+      status.textContent = '';
+    }
+  }
+
+  // drag start: always allow dragging (free play)
+  function onDragStart(source, piece, position, orientation){
+    // allow any piece dragging
+    return true;
+  }
+
+  // on drop: attempt move with chess.js
+  function onDrop(source, target){
+    const move = game.move({from: source, to: target, promotion: 'q'});
+    if(move === null) return 'snapback';
+    // after legal move, check if puzzle key matched (if in puzzle mode)
+    if(mode==='puzzle' && currentPuzzle){
+      const uci = source + target;
+      const ok = currentPuzzle.keys.some(k => k.toLowerCase() === uci.toLowerCase());
+      if(ok){
+        // show victory modal
+        showVictory();
+      } else {
+        // small feedback
+        status.textContent = 'Not yet — try again.';
+        setTimeout(()=>updateStatusText(),900);
+      }
+    }
+  }
+
+  function onSnapEnd(){
+    board.position(game.fen());
+  }
+
+  // mode toggle
+  modeToggle.addEventListener('click', ()=>{
+    if(mode==='free'){
+      mode = 'puzzle';
+      currentPuzzle = pickRandom();
+      initBoard(currentPuzzle.fen);
+      modeToggle.textContent = 'Mode: Puzzle';
+      newPuzzleBtn.style.display = 'inline-block';
+    } else {
+      mode = 'free';
+      currentPuzzle = null;
+      initBoard('start');
+      modeToggle.textContent = 'Mode: Free Play';
+      newPuzzleBtn.style.display = 'none';
+    }
+    updateStatusText();
+  });
+
+  // new puzzle
+  newPuzzleBtn.addEventListener('click', ()=>{
+    currentPuzzle = pickRandom();
+    initBoard(currentPuzzle.fen);
+    updateStatusText();
+  });
+
+  // hint: show target square textually
+  hintBtn.addEventListener('click', ()=>{
+    if(mode!=='puzzle' || !currentPuzzle) return;
+    const key = currentPuzzle.keys[0];
+    const tgt = key.slice(2,4);
+    status.textContent = 'The mist whispers to ' + tgt;
+    setTimeout(()=>updateStatusText(),1500);
+  });
+
+  // victory modal
+  const victory = document.getElementById('victory');
+  function showVictory(){
+    victory.classList.add('show');
+  }
+  document.getElementById('playAgain').addEventListener('click', ()=>{
+    victory.classList.remove('show');
+    if(mode==='puzzle') newPuzzleBtn.click();
+    else initBoard('start');
+  });
+
+  // join button
+  document.getElementById('joinBtn').addEventListener('click', ()=>{
+    const ok = confirm('You are about to open WhatsApp to join Crescendo Chess Club. Continue?');
+    if(ok) window.open('https://chat.whatsapp.com/Ey9vqmiVRTF0poI0zfqJMl?mode=wwt','_blank');
+  });
+
+  // music drone
+  musicBtn.addEventListener('click', ()=>{
+    musicOn = !musicOn;
+    if(musicOn){ startMusic(); musicBtn.textContent='Music: On'; }
+    else { stopMusic(); musicBtn.textContent='Music: Off'; }
+  });
+  function startMusic(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = 55;
+    g.gain.value = 0.0016;
+    const lfo = audioCtx.createOscillator();
+    const lfoGain = audioCtx.createGain();
+    lfo.frequency.value = 0.06;
+    lfoGain.gain.value = 0.005;
+    lfo.connect(lfoGain); lfoGain.connect(g.gain);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); lfo.start();
+    drone = {osc:o,lfo:lfo,gain:g};
+  }
+  function stopMusic(){
+    if(!audioCtx) return;
+    try{ drone.osc.stop(); drone.lfo.stop(); }catch(e){}
+    audioCtx.close(); audioCtx = null; drone=null;
+  }
+
+  // bats canvas (lightweight)
+  (function bats(){
+    const c = document.getElementById('batsCanvas');
+    if(!c) return;
+    const ctx = c.getContext('2d');
+    function resize(){ c.width = innerWidth; c.height = innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    const bats = [];
+    for(let i=0;i<4;i++) bats.push({x:Math.random()*c.width,y:Math.random()*c.height*0.5+20,vx:0.6+Math.random()*1.0,vy:(Math.random()*0.6)-0.3,scale:0.6+Math.random()*0.9,phase:Math.random()*Math.PI*2});
+    function drawBat(b){
+      ctx.save(); ctx.translate(b.x,b.y); ctx.scale(b.scale,b.scale);
+      ctx.fillStyle = '#0d0d0d'; ctx.beginPath(); ctx.ellipse(0,0,18,7,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#111'; ctx.beginPath(); ctx.moveTo(-6,0); ctx.quadraticCurveTo(-30,-10,-46,0); ctx.quadraticCurveTo(-30,8,-6,0); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(6,0); ctx.quadraticCurveTo(30,-10,46,0); ctx.quadraticCurveTo(30,8,6,0); ctx.fill();
+      ctx.globalCompositeOperation='lighter'; ctx.fillStyle='rgba(255,40,90,0.05)'; ctx.beginPath(); ctx.ellipse(0,0,30,14,0,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    function loop(){
+      ctx.clearRect(0,0,c.width,c.height);
+      for(const b of bats){
+        b.x += b.vx * (0.9 + Math.sin(b.phase)*0.6);
+        b.y += b.vy;
+        b.phase += 0.02;
+        if(b.x > c.width + 60){ b.x = -80; b.y = Math.random()*c.height*0.6 + 20; }
+        drawBat(b);
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  })();
+
+  // init default: Free Play
+  initBoard('start');
+  updateStatusText();
+  startMusic(); // start softly by default
+
+  // expose for debug if needed
+  window.__crescendo = { pickRandom, initBoard, board, puzzles };
+
+})();
+</script>
+</body>
+</html>
