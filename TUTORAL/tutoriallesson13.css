@@ -1,0 +1,18 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+table {
+	background-color:powderblue;
+    color:#696969;font-family:verdana;
+    font-size: 80%;
+    text-align:center;
+    width:80%;height:80%;
+}
+td.type1 {
+	background-color:#262641;
+	color:#F7F7F8;font-family:Arial, sans-serif;
+	font-size: 80%;
+	
+}
+    
