@@ -1,0 +1,109 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    padding: 20px;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #696969;
+}
+
+.outer-box {
+    border: 2px solid black;
+    padding: 15px;
+    background: powderblue;
+}
+
+.section-box {
+    border: 1px solid black;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background: powderblue;
+}
+
+.section-title {
+    font-weight: bold;
+    color: #696969;
+    text-decoration: underline;
+    margin: 0 0 10px 0;
+}
+
+.star {
+    color: red;
+}
+
+.two-column {
+    display: flex;
+    justify-content: space-between;
+    color: #696969;
+}
+
+.left, 
+.right {
+    width: 48%;
+}
+
+.text-box {
+    width: 95%;
+    height: 28px;
+    border: 1px solid black;
+    background: #ffffff;
+    color: #000000;
+}
+
+table {
+    width: 100%;
+}
+
+td {
+    padding: 5px 0;
+    font-size: 14px;
+}
+
+select, input[type="date"] {
+    width: 95%;
+    height: 28px;
+    border: 1px solid black;
+    background: #ffffff;
+    color: #000000;
+}
+
+.payment-box {
+    border: 1px solid black;
+    padding: 8px;
+    margin-bottom: 10px;
+    background: #ffffff;
+}
+
+.pay-title {
+    margin: 0 0 5px 0;
+    font-weight: bold;
+    color: #696969;
+}
+
+.big-box {
+    width: 100%;
+    height: 140px;
+    border: 1px solid black;
+    background: #ffffff;
+    color: #000000;
+}
+
+.buttons {
+    text-align: center;
+    margin-top: 10px;
+}
+
+button {
+    margin: 5px;
+    padding: 5px 20px;
+    border: 1px solid black;
+    background: #FEFEFE;
+    color: black;
+}
+
+button:hover {
+    background: #45a049;
+}

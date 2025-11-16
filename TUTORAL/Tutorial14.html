@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Reservations</title>
+    <link rel="stylesheet" href="Tutorial14.css">
+</head>
+<body>
+
+<h2 class="title">Room Reservations</h2>
+
+<div class="outer-box">
+
+    <div class="section-box">
+        <p class="section-title">Personal details <span class="star">*</span></p>
+
+        <div class="two-column">
+            <div class="left">
+                <label>Full Name</label><br>
+                <input type="text" class="text-box">
+
+                <br><br>
+
+                <label>Email address</label><br>
+                <input type="email" class="text-box">
+            </div>
+
+            <div class="right">
+                <label>IC No.</label><br>
+                <input type="text" class="text-box">
+
+                <br><br>
+
+                <label>Contact No.</label><br>
+                <input type="text" class="text-box">
+            </div>
+        </div>
+    </div>
+
+  
+    <div class="section-box">
+        <p class="section-title">Reservations <span class="star">*</span></p>
+
+        <div class="two-column">
+
+           
+            <div class="left">
+                <table>
+                    <tr>
+                        <td>Number of Room(s)</td>
+                        <td><select><option>- Selection -</option></select></td>
+                    </tr>
+
+                    <tr>
+                        <td>Number of Adult(s)</td>
+                        <td><select><option>- Selection -</option></select></td>
+                    </tr>
+
+                    <tr>
+                        <td>Number of Children</td>
+                        <td><select><option>- Selection -</option></select></td>
+                    </tr>
+
+                    <tr>
+                        <td>Check-in Date</td>
+                        <td><input type="date"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Check-out Date</td>
+                        <td><input type="date"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Room Preference</td>
+                        <td>
+                            <input type="checkbox"> Deluxe
+                            <input type="checkbox"> Suite
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="right">
+
+                <div class="payment-box">
+                    <p class="pay-title">Payment Method</p>
+                    <label><input type="radio" name="pay"> Cash</label>
+                    <label><input type="radio" name="pay"> TNG</label>
+                </div>
+
+                <p class="requests">Do you have any<br>special requests?</p>
+
+                <textarea class="big-box"></textarea>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button>Submit</button>
+        <button>Reset</button>
+    </div>
+
+</div>
+
+</body>
+</html>
